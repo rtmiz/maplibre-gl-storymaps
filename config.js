@@ -250,7 +250,7 @@ var config = {
                 // Flip the pitch - now looking along the 3.1° ILS glidepath in
                 // pseudo-3D, extruded to true scale (real meters of altitude)
                 center: [16.54, 48.15],
-                zoom: 12,
+                zoom: 12,‹ Prev
                 pitch: 68,
                 bearing: 0
             },
