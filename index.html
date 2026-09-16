@@ -8,11 +8,13 @@
     <link rel="icon" type="image/svg+xml" href="https://maplibre.org/favicon.ico">
     <script src='https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js'></script>
     <link href='https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css' rel='stylesheet' />
-    <script src="https://unpkg.com/scrollama"></script>
     <style>
+        html,
         body {
             margin: 0;
             padding: 0;
+            height: 100%;
+            overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
         }
 
@@ -32,7 +34,9 @@
         #header {
             margin: auto;
             width: 100%;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
             z-index: 5;
         }
 
@@ -46,43 +50,16 @@
 
         #footer {
             width: 100%;
-            min-height: 5vh;
-            padding-top: 2vh;
-            padding-bottom: 2vh;
+            min-height: 4vh;
+            padding-top: 1vh;
+            padding-bottom: 1vh;
             text-align: center;
-            line-height: 25px;
-            font-size: 13px;
-            position: relative;
+            line-height: 20px;
+            font-size: 11px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
             z-index: 5;
-        }
-
-        #features {
-            padding-top: 10vh;
-            padding-bottom: 10vh;
-        }
-
-        .hidden {
-            visibility: hidden;
-        }
-
-        .centered {
-            width: 50vw;
-            margin: 0 auto;
-        }
-
-        .lefty {
-            width: 33vw;
-            margin-left: 5vw;
-        }
-
-        .righty {
-            width: 33vw;
-            margin-left: 62vw;
-        }
-
-        .fully {
-            width: 100%;
-            margin: auto;
         }
 
         .light {
@@ -95,34 +72,240 @@
             background-color: #444;
         }
 
-        .step {
-            padding-bottom: 50vh;
-            opacity: 0.25;
-        }
-
-        .step.active {
-            opacity: 0.9;
-        }
-
-        .step div {
-            padding: 25px 50px;
+        /* Caption panel: one chapter's text/image shown at a time, swapped by goToChapter() */
+        #caption-panel {
+            display: none;
+            position: fixed;
+            bottom: 8vh;
+            z-index: 6;
+            padding: 20px 30px;
+            border-radius: 6px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
             line-height: 25px;
-            font-size: 13px;
+            font-size: 14px;
+            transition: opacity 0.25s ease;
         }
 
-        .step img {
+        #caption-panel h3 {
+            margin-top: 0;
+        }
+
+        #caption-panel img {
             width: 100%;
+            border-radius: 4px;
+        }
+
+        #caption-panel.centered {
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40vw;
+        }
+
+        #caption-panel.lefty {
+            left: 5vw;
+            width: 30vw;
+        }
+
+        #caption-panel.righty {
+            right: 5vw;
+            width: 30vw;
+        }
+
+        #caption-panel.fully {
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70vw;
+        }
+
+        #caption-panel.righty-large {
+            right: 5vw;
+            width: 50vw;
+        }
+
+        #caption-panel.top-righty {
+            bottom: auto;
+            top: 8vh;
+            right: 5vw;
+            width: 34vw;
         }
 
         @media (max-width: 750px) {
 
-            .centered,
-            .lefty,
-            .righty,
-            .fully {
-                width: 90vw;
-                margin: 0 auto;
+            #caption-panel.centered,
+            #caption-panel.lefty,
+            #caption-panel.righty,
+            #caption-panel.top-righty,
+            #caption-panel.righty-large,
+            #caption-panel.fully {
+                left: 5vw;
+                right: 5vw;
+                width: auto;
+                transform: none;
             }
+        }
+
+        /* Slide panel: full-screen info "slide" for chapters that aren't about
+           geography (formats, encodings, API walkthroughs). Sits above the map but
+           below #nav-controls so Prev/Next stay usable. */
+        #slide-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 6;
+            overflow-y: auto;
+            padding: 8vh 10vw 14vh 10vw;
+            box-sizing: border-box;
+            transition: opacity 0.25s ease;
+        }
+
+        #slide-panel .slide-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        #slide-panel h2 {
+            font-size: 2.6em;
+            margin: 0 0 0.6em 0;
+            line-height: 1.15;
+        }
+
+        #slide-panel h3 {
+            font-size: 1.5em;
+            margin: 1.4em 0 0.4em 0;
+        }
+
+        #slide-panel p,
+        #slide-panel li {
+            font-size: 1.35em;
+            line-height: 1.6;
+        }
+
+        #slide-panel ul {
+            padding-left: 1.2em;
+        }
+
+        #slide-panel li {
+            margin-bottom: 0.5em;
+        }
+
+        #slide-panel code,
+        #slide-panel pre {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            background: rgba(127, 127, 127, 0.22);
+            border-radius: 4px;
+        }
+
+        #slide-panel code {
+            padding: 0.1em 0.35em;
+            font-size: 0.95em;
+        }
+
+        #slide-panel pre {
+            padding: 0.9em 1.1em;
+            font-size: 1.15em;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        #slide-panel .accent {
+            color: #ffd23f;
+        }
+
+        /* Build steps: elements tagged data-step="N" are walked through one at a
+           time with Next/Prev. Current one is accented, not-yet-reached ones dim. */
+        #slide-panel [data-step] {
+            transition: opacity 0.25s ease, color 0.25s ease, background-color 0.25s ease;
+        }
+
+        #slide-panel .step-future {
+            opacity: 0.25;
+        }
+
+        #slide-panel .step-current {
+            color: #ffd23f;
+        }
+
+        #slide-panel pre .step-current,
+        #slide-panel .step-current code {
+            background: rgba(255, 210, 63, 0.25);
+            color: #ffd23f;
+            border-radius: 3px;
+        }
+
+        /* Popup: an extra click on a map chapter that overlays an image
+           (a chart crop, a screenshot) without leaving the chapter. */
+        #popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 8;
+            background: rgba(0, 0, 0, 0.72);
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.25s ease;
+        }
+
+        #popup-overlay.visible {
+            display: flex;
+        }
+
+        #popup-overlay img,
+        #popup-overlay video {
+            display: block;
+            max-width: 78vw;
+            max-height: 74vh;
+            border-radius: 8px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        #popup-overlay .popup-caption {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 18px;
+            color: #fafafa;
+            text-shadow: 0 1px 4px #000;
+        }
+
+        /* Prev/Next navigation controls */
+        #nav-controls {
+            position: fixed;
+            bottom: 3vh;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;   /* above #popup-overlay so nav stays usable */
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 24px;
+            font-size: 13px;
+        }
+
+        #nav-controls button {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            padding: 6px 16px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        #nav-controls button:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        #nav-controls button:disabled {
+            opacity: 0.3;
+            cursor: default;
         }
 
         /* Fix issue on mobile browser where scroll breaks */
@@ -170,13 +353,13 @@
             border-radius: 50%;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
+
     </style>
 </head>
 
 <body>
 
     <div id="map"></div>
-    <div id="story"></div>
 
     <script src="./config.js"></script>
     <script>
@@ -196,6 +379,8 @@
             'left': 'lefty',
             'center': 'centered',
             'right': 'righty',
+            'right-large': 'righty-large',
+            'top-right': 'top-righty',
             'full': 'fully'
         }
 
@@ -216,10 +401,6 @@
                 map.setPaintProperty(layer.layer, prop, layer.opacity, options);
             });
         }
-
-        var story = document.getElementById('story');
-        var features = document.createElement('div');
-        features.setAttribute('id', 'features');
 
         var header = document.createElement('div');
 
@@ -244,47 +425,8 @@
         if (header.innerText.length > 0) {
             header.classList.add(config.theme);
             header.setAttribute('id', 'header');
-            story.appendChild(header);
+            document.body.appendChild(header);
         }
-
-        config.chapters.forEach((record, idx) => {
-            var container = document.createElement('div');
-            var chapter = document.createElement('div');
-
-            if (record.title) {
-                var title = document.createElement('h3');
-                title.innerText = record.title;
-                chapter.appendChild(title);
-            }
-
-            if (record.image) {
-                var image = new Image();
-                image.src = record.image;
-                chapter.appendChild(image);
-            }
-
-            if (record.description) {
-                var story = document.createElement('p');
-                story.innerHTML = record.description;
-                chapter.appendChild(story);
-            }
-
-            container.setAttribute('id', record.id);
-            container.classList.add('step');
-            if (idx === 0) {
-                container.classList.add('active');
-            }
-
-            chapter.classList.add(config.theme);
-            container.appendChild(chapter);
-            container.classList.add(alignments[record.alignment] || 'centered');
-            if (record.hidden) {
-                container.classList.add('hidden');
-            }
-            features.appendChild(container);
-        });
-
-        story.appendChild(features);
 
         var footer = document.createElement('div');
 
@@ -297,8 +439,157 @@
         if (footer.innerText.length > 0) {
             footer.classList.add(config.theme);
             footer.setAttribute('id', 'footer');
-            story.appendChild(footer);
+            document.body.appendChild(footer);
         }
+
+        // Caption panel: shows the current chapter's title/image/description
+        var captionPanel = document.createElement('div');
+        captionPanel.id = 'caption-panel';
+        document.body.appendChild(captionPanel);
+
+        // Full-screen info slide, for chapters where the map isn't the point.
+        // Driven by `slide: true` + an HTML `content` string on the chapter.
+        var slidePanel = document.createElement('div');
+        slidePanel.id = 'slide-panel';
+        document.body.appendChild(slidePanel);
+
+        function renderSlide(chapter) {
+            slidePanel.className = '';
+            slidePanel.classList.add(config.theme);
+            slidePanel.innerHTML = '<div class="slide-inner">' +
+                (chapter.title ? '<h2>' + chapter.title + '</h2>' : '') +
+                (chapter.content || '') +
+                '</div>';
+            slidePanel.style.display = 'block';
+            slidePanel.style.opacity = 0;
+            requestAnimationFrame(function () {
+                slidePanel.style.opacity = 1;
+            });
+        }
+
+        // Popup overlay: an extra click on a map chapter, without leaving it
+        var popupOverlay = document.createElement('div');
+        popupOverlay.id = 'popup-overlay';
+        document.body.appendChild(popupOverlay);
+
+        function showPopup(chapter) {
+            var isVideo = /\.(mp4|webm|mov|m4v)$/i.test(chapter.popup);
+            // Audio is left on deliberately - for a flyover clip the sound is the point.
+            // The Next click/keypress counts as the user gesture browsers require, but
+            // `controls` is there as a fallback if autoplay is still refused.
+            var media = isVideo
+                ? '<video src="' + chapter.popup + '" autoplay controls playsinline></video>'
+                : '<img src="' + chapter.popup + '" alt="">';
+
+            popupOverlay.innerHTML = '<div>' + media +
+                (chapter.popupCaption ? '<div class="popup-caption">' + chapter.popupCaption + '</div>' : '') +
+                '</div>';
+            popupOverlay.classList.add('visible');
+        }
+
+        function hidePopup() {
+            popupOverlay.classList.remove('visible');
+            // clear the contents too, otherwise a video keeps playing (and audible)
+            // behind the next chapter
+            popupOverlay.innerHTML = '';
+        }
+
+        // Number of build steps on the current slide, inferred from the highest
+        // data-step in its markup - so a slide never has to declare a count that
+        // could drift out of sync with its content.
+        function slideStepCount() {
+            var max = 0;
+            slidePanel.querySelectorAll('[data-step]').forEach(function (el) {
+                var v = parseInt(el.getAttribute('data-step'), 10);
+                if (!isNaN(v) && v > max) max = v;
+            });
+            return max;
+        }
+
+        // Extra Next/Prev clicks a chapter holds before moving on: slides count
+        // their data-step build, map chapters count 1 if they carry a popup.
+        function stepCount(chapter) {
+            if (chapter.slide) return slideStepCount();
+            if (chapter.popup) return 1;
+            return 0;
+        }
+
+        function applyStep(chapter) {
+            if (chapter.slide) {
+                applySlideStep();
+            } else if (chapter.popup) {
+                if (currentStep >= 1) showPopup(chapter);
+                else hidePopup();
+            }
+        }
+
+        // step 0 shows the slide un-annotated; 1..N walk through the segments
+        function applySlideStep() {
+            slidePanel.querySelectorAll('[data-step]').forEach(function (el) {
+                var v = parseInt(el.getAttribute('data-step'), 10);
+                el.classList.remove('step-current', 'step-future', 'step-past');
+                if (currentStep === 0) return;
+                if (v === currentStep) el.classList.add('step-current');
+                else if (v > currentStep) el.classList.add('step-future');
+                else el.classList.add('step-past');
+            });
+        }
+
+        function renderCaption(chapter) {
+            captionPanel.style.opacity = 0;
+            setTimeout(function () {
+                captionPanel.className = '';
+                captionPanel.innerHTML = '';
+
+                if (chapter.hidden || (!chapter.title && !chapter.image && !chapter.description)) {
+                    captionPanel.style.display = 'none';
+                    return;
+                }
+
+                captionPanel.classList.add(config.theme);
+                captionPanel.classList.add(alignments[chapter.alignment] || 'centered');
+
+                if (chapter.title) {
+                    var title = document.createElement('h3');
+                    title.innerText = chapter.title;
+                    captionPanel.appendChild(title);
+                }
+
+                if (chapter.image) {
+                    var image = new Image();
+                    image.src = chapter.image;
+                    captionPanel.appendChild(image);
+                }
+
+                if (chapter.description) {
+                    var desc = document.createElement('p');
+                    desc.innerHTML = chapter.description;
+                    captionPanel.appendChild(desc);
+                }
+
+                captionPanel.style.display = 'block';
+                requestAnimationFrame(function () {
+                    captionPanel.style.opacity = 1;
+                });
+            }, 150);
+        }
+
+        // Prev/Next navigation controls
+        var navControls = document.createElement('div');
+        navControls.id = 'nav-controls';
+
+        var prevBtn = document.createElement('button');
+        prevBtn.innerText = '‹ Prev';
+
+        var counter = document.createElement('span');
+
+        var nextBtn = document.createElement('button');
+        nextBtn.innerText = 'Next ›';
+
+        navControls.appendChild(prevBtn);
+        navControls.appendChild(counter);
+        navControls.appendChild(nextBtn);
+        document.body.appendChild(navControls);
 
         // Initialize MapLibre map
         var map = new maplibregl.Map({
@@ -348,8 +639,157 @@
             marker.setLngLat(config.chapters[0].location.center).addTo(map);
         }
 
-        // Instantiate the scrollama
-        var scroller = scrollama();
+        var currentChapterIndex = 0;
+        var currentStep = 0;        // build step within a slide chapter
+        var navDirection = 1;       // +1 forward, -1 backward - decides where a slide opens
+
+        function updateNav() {
+            var chapter = config.chapters[currentChapterIndex];
+            var steps = stepCount(chapter);
+
+            counter.innerText = (currentChapterIndex + 1) + ' / ' + config.chapters.length +
+                (steps ? '  ·  ' + currentStep + '/' + steps : '');
+
+            prevBtn.disabled = currentChapterIndex === 0 && currentStep === 0;
+            nextBtn.disabled = currentChapterIndex === config.chapters.length - 1 &&
+                currentStep === steps;
+
+            // Title banner and footer are intro-only, like they'd scroll away in the old layout
+            var showIntroChrome = currentChapterIndex === 0;
+            header.style.display = showIntroChrome ? '' : 'none';
+            footer.style.display = showIntroChrome ? '' : 'none';
+        }
+
+        function enterChapter(idx) {
+            var chapter = config.chapters[idx];
+
+            // Info slides cover the map entirely, so skip the camera move and the
+            // marker work - and let them omit `location` altogether.
+            hidePopup();
+
+            if (chapter.slide) {
+                captionPanel.style.display = 'none';
+                renderSlide(chapter);
+                // arriving forwards opens the slide un-annotated; arriving backwards
+                // from a later chapter opens it fully built, where you left it
+                currentStep = navDirection < 0 ? slideStepCount() : 0;
+                applySlideStep();
+                if (chapter.onChapterEnter && chapter.onChapterEnter.length > 0) {
+                    chapter.onChapterEnter.forEach(setLayerOpacity);
+                }
+                updateNav();
+                return;
+            }
+
+            // like slides, arriving backwards lands on the chapter fully built
+            currentStep = navDirection < 0 ? stepCount(chapter) : 0;
+            applyStep(chapter);
+            slidePanel.style.display = 'none';
+
+            // The pin can be placed independently of the camera's framing center -
+            // e.g. to keep it off to the side, clear of the caption panel - by
+            // setting a chapter's markerLocation; falls back to location.center.
+            var markerLocation = chapter.markerLocation || chapter.location.center;
+
+            // MapLibre's camera padding persists across flyTo/easeTo calls until
+            // explicitly changed - without this, a chapter that sets padding would
+            // leak it into every chapter after it that doesn't set its own.
+            var location = chapter.location;
+            if (!location.padding) {
+                location = Object.assign({}, location, { padding: { top: 0, bottom: 0, left: 0, right: 0 } });
+            }
+
+            map[chapter.mapAnimation || 'flyTo'](location);
+
+            if (config.showMarkers && marker) {
+                // Some chapters (e.g. the wide reveal) center the camera on a framing
+                // point rather than an actual place - don't show a misleading pin there
+                if (chapter.showMarker === false) {
+                    marker.remove();
+                } else {
+                    marker.setLngLat(markerLocation).addTo(map);
+                }
+            }
+
+            if (insetMap && insetMarker) {
+                insetMap.setCenter(markerLocation);
+                insetMarker.setLngLat(markerLocation);
+            }
+
+            if (chapter.onChapterEnter.length > 0) {
+                chapter.onChapterEnter.forEach(setLayerOpacity);
+            }
+            if (chapter.callback) {
+                window[chapter.callback]();
+            }
+            if (chapter.rotateAnimation) {
+                map.once('moveend', () => {
+                    const rotateNumber = map.getBearing();
+                    map.rotateTo(rotateNumber + 180, {
+                        duration: 30000, easing: function (t) {
+                            return t;
+                        }
+                    });
+                });
+            }
+
+            renderCaption(chapter);
+            updateNav();
+        }
+
+        function goToChapter(idx) {
+            idx = Math.max(0, Math.min(idx, config.chapters.length - 1));
+            if (idx === currentChapterIndex) return;
+
+            navDirection = idx > currentChapterIndex ? 1 : -1;
+
+            var prevChapter = config.chapters[currentChapterIndex];
+            // onChapterExit is optional - info slides typically won't define one
+            if (prevChapter.onChapterExit && prevChapter.onChapterExit.length > 0) {
+                prevChapter.onChapterExit.forEach(setLayerOpacity);
+            }
+
+            currentChapterIndex = idx;
+            enterChapter(idx);
+        }
+
+        // On a slide with build steps, Next/Prev walk the steps first and only then
+        // move between chapters - so one clicker button drives the whole talk.
+        function stepForward() {
+            var chapter = config.chapters[currentChapterIndex];
+            if (currentStep < stepCount(chapter)) {
+                currentStep++;
+                applyStep(chapter);
+                updateNav();
+                return;
+            }
+            goToChapter(currentChapterIndex + 1);
+        }
+
+        function stepBack() {
+            var chapter = config.chapters[currentChapterIndex];
+            if (currentStep > 0) {
+                currentStep--;
+                applyStep(chapter);
+                updateNav();
+                return;
+            }
+            goToChapter(currentChapterIndex - 1);
+        }
+
+        prevBtn.addEventListener('click', stepBack);
+        nextBtn.addEventListener('click', stepForward);
+
+        // Arrow keys / Page Up-Down / Space so a presentation clicker works too
+        window.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+                stepForward();
+                e.preventDefault();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+                stepBack();
+                e.preventDefault();
+            }
+        });
 
         map.on("load", function () {
             // Add 3D terrain if enabled
@@ -378,69 +818,455 @@
                 }
             }
 
-            // Setup scrollama
-            scroller
-                .setup({
-                    step: '.step',
-                    offset: 0.5,
-                    progress: true
-                })
-                .onStepEnter(async response => {
-                    var current_chapter = config.chapters.findIndex(chap => chap.id === response.element.id);
-                    var chapter = config.chapters[current_chapter];
+            // LOWW ICAO aerodrome chart, draped onto its real-world footprint.
+            // Rasterized at 300dpi from the source PDF (4963x3505) for sharpness.
+            // Corner coordinates solved from the chart's printed THR11/THR29
+            // coordinates vs. their pixel positions in the raster, located with a
+            // pixel ruler overlay (grid burned into a crop) rather than eyeballing -
+            // the previous version's pick was off by ~150-250px at each threshold.
+            // Chart is rotated ~25.8° off true north on the page (not north-up).
+            map.addSource('loww-chart', {
+                type: 'image',
+                url: './assets/loww_ground_map_hires.png',
+                coordinates: [
+                    [16.531757, 48.152726], // image top-left
+                    [16.632747, 48.120171], // image top-right
+                    [16.598309, 48.072555], // image bottom-right
+                    [16.497320, 48.105110]  // image bottom-left
+                ]
+            });
 
-                    response.element.classList.add('active');
-                    map[chapter.mapAnimation || 'flyTo'](chapter.location);
+            map.addLayer({
+                id: 'loww-chart-overlay',
+                type: 'raster',
+                source: 'loww-chart',
+                paint: {
+                    'raster-opacity': 0,
+                    'raster-fade-duration': 0
+                }
+            });
 
-                    // Update main marker
-                    if (config.showMarkers && marker) {
-                        marker.setLngLat(chapter.location.center);
-                    }
+            // RWY 11/29 physical runway + extended approach centerline (LOWW).
+            // Threshold coordinates are the ones printed on the official ICAO
+            // aerodrome chart (AIRAC AMDT 296/15 MAY 2025, LOWW AD 2 MAP 1-1):
+            //   THR11 48°07'22"N 016°32'00"E   THR29 48°06'33"N 016°34'32"E
+            // True heading, computed geodetically between those two published
+            // points (not the rounded "111" runway designator, which is a
+            // magnetic heading - Vienna's ~4-5°E variation is why these differ):
+            //   115.76° true (THR11->THR29), reciprocal 295.76° for the approach side
+            // Home sits 391m to the side of the centerline; the closest point on
+            // the centerline to home is 12.36km out from THR11.
+            map.addSource('loww-rwy11', {
+                type: 'geojson',
+                tolerance: 0, // this line spans 45km but gets viewed zoomed into a few hundred
+                              // meters of it - default GeoJSON tile simplification can shift
+                              // vertices at that scale; disable it for exact positioning
+                data: {
+                    type: 'FeatureCollection',
+                    features: [
+                        {
+                            type: 'Feature',
+                            properties: { name: 'runway' },
+                            geometry: {
+                                type: 'LineString',
+                                coordinates: [
+                                    [16.533333, 48.122778], // THR11
+                                    [16.575556, 48.109167]  // THR29
+                                ]
+                            }
+                        },
+                        {
+                            // Split at the closest-point-to-home so that point is an actual
+                            // vertex of the line (not just a nearby collinear point) - guarantees
+                            // it renders exactly on the line regardless of tiling/simplification.
+                            type: 'Feature',
+                            properties: { name: 'extended-centerline' },
+                            geometry: {
+                                type: 'LineString',
+                                coordinates: [
+                                    [16.383645, 48.170850], // closest point on the centerline to home
+                                    [16.533333, 48.122778], // THR11 (pass-through, not an endpoint)
+                                    [16.575556, 48.109167]  // THR29 - the line's actual terminus
+                                ]
+                            }
+                        },
+                        {
+                            type: 'Feature',
+                            properties: { name: 'extended-centerline' },
+                            geometry: {
+                                type: 'LineString',
+                                coordinates: [
+                                    [15.985452, 48.297348], // 45km out on final, along true bearing 295.76° - well offscreen
+                                    [16.383645, 48.170850]  // closest point on the centerline to home
+                                ]
+                            }
+                        },
+                        {
+                            type: 'Feature',
+                            properties: { name: 'thr11' },
+                            geometry: {
+                                type: 'Point',
+                                coordinates: [16.533333, 48.122778]
+                            }
+                        },
+                        {
+                            type: 'Feature',
+                            properties: { name: 'crosstrack' },
+                            geometry: {
+                                type: 'LineString',
+                                coordinates: [
+                                    [16.381493, 48.167861],   // home (updated, more accurate)
+                                    [16.383645, 48.170850]    // closest point on the centerline to home
+                                ]
+                            }
+                        },
+                        {
+                            type: 'Feature',
+                            properties: { name: 'closest-point', label: '12.33 km / 6.66 NM to THR 11' },
+                            geometry: {
+                                type: 'Point',
+                                coordinates: [16.383645, 48.170850]
+                            }
+                        },
+                        {
+                            type: 'Feature',
+                            properties: { name: 'home' },
+                            geometry: {
+                                type: 'Point',
+                                coordinates: [16.381493, 48.167861]
+                            }
+                        },
+                        {
+                            // Midpoint of the crosstrack line, for the "distance from home
+                            // to the centerline" label (369m perpendicular offset)
+                            type: 'Feature',
+                            properties: { name: 'crosstrack-label', label: '369 m to centerline' },
+                            geometry: {
+                                type: 'Point',
+                                coordinates: [16.382569, 48.169356]
+                            }
+                        }
+                    ]
+                }
+            });
 
-                    // Update inset map
-                    if (insetMap && insetMarker) {
-                        insetMap.setCenter(chapter.location.center);
-                        insetMarker.setLngLat(chapter.location.center);
-                    }
+            // Extended centerline drawn first, full span (45km out -> THR11 -> THR29);
+            // the solid runway pavement is drawn after so it sits on top where they overlap.
+            map.addLayer({
+                id: 'rwy11-extended-centerline',
+                type: 'line',
+                source: 'loww-rwy11',
+                filter: ['==', ['get', 'name'], 'extended-centerline'],
+                paint: {
+                    'line-color': '#ff6b6b',
+                    'line-width': 2,
+                    'line-dasharray': [2, 2],
+                    'line-opacity': 0
+                }
+            });
 
-                    if (chapter.onChapterEnter.length > 0) {
-                        chapter.onChapterEnter.forEach(setLayerOpacity);
-                    }
-                    if (chapter.callback) {
-                        window[chapter.callback]();
-                    }
-                    if (chapter.rotateAnimation) {
-                        map.once('moveend', () => {
-                            const rotateNumber = map.getBearing();
-                            map.rotateTo(rotateNumber + 180, {
-                                duration: 30000, easing: function (t) {
-                                    return t;
-                                }
-                            });
-                        });
-                    }
-                    if (config.auto) {
-                        var next_chapter = (current_chapter + 1) % config.chapters.length;
-                        map.once('moveend', () => {
-                            document.querySelectorAll('[data-scrollama-index="' + next_chapter.toString() + '"]')[0].scrollIntoView();
-                        });
-                    }
-                })
-                .onStepExit(response => {
-                    var chapter = config.chapters.find(chap => chap.id === response.element.id);
-                    response.element.classList.remove('active');
-                    if (chapter.onChapterExit.length > 0) {
-                        chapter.onChapterExit.forEach(setLayerOpacity);
-                    }
-                });
+            map.addLayer({
+                id: 'rwy11-runway',
+                type: 'line',
+                source: 'loww-rwy11',
+                filter: ['==', ['get', 'name'], 'runway'],
+                paint: {
+                    'line-color': '#ff6b6b',
+                    'line-width': 4,
+                    'line-opacity': 0
+                }
+            });
 
-            if (config.auto) {
-                document.querySelectorAll('[data-scrollama-index="0"]')[0].scrollIntoView();
-            }
+            map.addLayer({
+                id: 'rwy11-thr11-dot',
+                type: 'circle',
+                source: 'loww-rwy11',
+                filter: ['==', ['get', 'name'], 'thr11'],
+                paint: {
+                    'circle-radius': 5,
+                    'circle-color': '#ff6b6b',
+                    'circle-stroke-color': '#000000',
+                    'circle-stroke-width': 1,
+                    'circle-opacity': 0,
+                    'circle-stroke-opacity': 0
+                }
+            });
+
+            map.addLayer({
+                id: 'rwy11-crosstrack',
+                type: 'line',
+                source: 'loww-rwy11',
+                filter: ['==', ['get', 'name'], 'crosstrack'],
+                paint: {
+                    'line-color': '#ffd23f',
+                    'line-width': 2,
+                    'line-opacity': 0
+                }
+            });
+
+            map.addLayer({
+                id: 'rwy11-closest-point',
+                type: 'circle',
+                source: 'loww-rwy11',
+                filter: ['==', ['get', 'name'], 'closest-point'],
+                paint: {
+                    'circle-radius': 5,
+                    'circle-color': '#ffd23f',
+                    'circle-stroke-color': '#000000',
+                    'circle-stroke-width': 1,
+                    'circle-opacity': 0,
+                    'circle-stroke-opacity': 0
+                }
+            });
+
+            map.addLayer({
+                id: 'rwy11-home-marker',
+                type: 'circle',
+                source: 'loww-rwy11',
+                filter: ['==', ['get', 'name'], 'home'],
+                paint: {
+                    'circle-radius': 6,
+                    'circle-color': config.markerColor || '#3FB1CE',
+                    'circle-stroke-color': '#ffffff',
+                    'circle-stroke-width': 2,
+                    'circle-opacity': 0,
+                    'circle-stroke-opacity': 0
+                }
+            });
+
+            // Big "?" hovering over the apartment. A symbol layer rather than extruded
+            // geometry on purpose: fill-extrusion only extrudes straight up from a flat
+            // footprint, so a "?"-shaped footprint would read as a blob from a pitched
+            // camera. Symbols are billboards, so this stays legible from any angle.
+            // It anchors at ground level, so text-offset lifts it visually above the roof.
+            map.addLayer({
+                id: 'home-question-mark',
+                type: 'symbol',
+                source: 'loww-rwy11',
+                filter: ['==', ['get', 'name'], 'home'],
+                layout: {
+                    'text-field': '?',
+                    'text-size': 90,
+                    'text-offset': [0, -1.1],
+                    'text-anchor': 'bottom',
+                    'text-allow-overlap': true,
+                    'text-ignore-placement': true
+                },
+                paint: {
+                    'text-color': '#ffd23f',
+                    'text-halo-color': '#000000',
+                    'text-halo-width': 3,
+                    'text-opacity': 0,
+                    'icon-opacity': 0
+                }
+            });
+
+            map.addLayer({
+                id: 'rwy11-distance-label',
+                type: 'symbol',
+                source: 'loww-rwy11',
+                filter: ['==', ['get', 'name'], 'closest-point'],
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-size': 22,
+                    'text-offset': [0, -1.2],
+                    'text-anchor': 'bottom',
+                    'text-allow-overlap': true,
+                    'text-ignore-placement': true
+                },
+                paint: {
+                    'text-color': '#ffffff',
+                    'text-halo-color': '#000000',
+                    'text-halo-width': 2,
+                    'text-opacity': 0,
+                    'icon-opacity': 0
+                }
+            });
+
+            map.addLayer({
+                id: 'rwy11-crosstrack-label',
+                type: 'symbol',
+                source: 'loww-rwy11',
+                filter: ['==', ['get', 'name'], 'crosstrack-label'],
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-size': 18,
+                    'text-offset': [0, 1.2],
+                    'text-anchor': 'top',
+                    'text-allow-overlap': true,
+                    'text-ignore-placement': true
+                },
+                paint: {
+                    'text-color': '#ffd23f',
+                    'text-halo-color': '#000000',
+                    'text-halo-width': 2,
+                    'text-opacity': 0,
+                    'icon-opacity': 0
+                }
+            });
+
+            // LOWW ILS RWY11 glidepath (3.1°, published): a filled wedge from the
+            // ground (base=0) up to the glidepath altitude at each point along the
+            // extended centerline (height = distance-from-threshold * tan(3.1°)),
+            // built from many short segments so the sloped top edge reads smooth
+            // rather than as a visible staircase.
+            // Data precomputed in assets/glideslope.geojson (900 x 50m segments,
+            // THR11 out to 45km): each polygon carries {base: 0, height} in meters.
+            map.addSource('glideslope', {
+                type: 'geojson',
+                tolerance: 0, // this source mixes a 45km wall with ~18m slant-line segments -
+                              // default simplification can collapse/drop the tiny ones
+                data: './assets/glideslope.geojson'
+            });
+
+            map.addLayer({
+                id: 'glideslope-wall',
+                type: 'fill-extrusion',
+                source: 'glideslope',
+                filter: ['!', ['has', 'marker']],
+                paint: {
+                    'fill-extrusion-color': '#ff6b6b',
+                    'fill-extrusion-base': ['get', 'base'],
+                    'fill-extrusion-height': ['get', 'height'],
+                    'fill-extrusion-opacity': 0
+                }
+            });
+
+            // The single wall segment at the intercept (home's abeam point), picked out
+            // in yellow to match the crosstrack/closest-point color, with its own height
+            map.addLayer({
+                id: 'glideslope-intercept-pillar',
+                type: 'fill-extrusion',
+                source: 'glideslope',
+                filter: ['==', ['get', 'marker'], 'intercept-pillar'],
+                paint: {
+                    'fill-extrusion-color': '#ffd23f',
+                    'fill-extrusion-base': ['get', 'base'],
+                    'fill-extrusion-height': ['get', 'height'],
+                    'fill-extrusion-opacity': 0
+                }
+            });
+
+            map.addLayer({
+                id: 'glideslope-intercept-label',
+                type: 'symbol',
+                source: 'glideslope',
+                filter: ['==', ['get', 'marker'], 'intercept-pillar'],
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-size': 22,
+                    'text-offset': [0, -2],
+                    'text-anchor': 'bottom',
+                    'text-allow-overlap': true,
+                    'text-ignore-placement': true
+                },
+                paint: {
+                    'text-color': '#ffd23f',
+                    'text-halo-color': '#000000',
+                    'text-halo-width': 1.5,
+                    'text-opacity': 0,
+                    'icon-opacity': 0
+                }
+            });
+
+            // Straight-line ("slant range") distance from home to the aircraft's
+            // position at the intercept: the hypotenuse of the 368.7m cross-track
+            // offset and the 667.5m glidepath altitude there - drawn the same way
+            // as the glideslope wall (many short segments, ramping base->height)
+            // so it reads as an actual tilted line rather than just a number.
+            map.addLayer({
+                id: 'glideslope-home-slant-line',
+                type: 'fill-extrusion',
+                source: 'glideslope',
+                filter: ['==', ['get', 'marker'], 'home-slant-line'],
+                paint: {
+                    'fill-extrusion-color': '#ffd23f',
+                    'fill-extrusion-base': ['get', 'base'],
+                    'fill-extrusion-height': ['get', 'height'],
+                    'fill-extrusion-opacity': 0
+                }
+            });
+
+            map.addLayer({
+                id: 'glideslope-home-slant-label',
+                type: 'symbol',
+                source: 'glideslope',
+                filter: ['==', ['get', 'marker'], 'home-slant-label'],
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-size': 18,
+                    'text-offset': [0, -1],
+                    'text-anchor': 'bottom',
+                    'text-allow-overlap': true,
+                    'text-ignore-placement': true
+                },
+                paint: {
+                    'text-color': '#ffd23f',
+                    'text-halo-color': '#000000',
+                    'text-halo-width': 1.5,
+                    'text-opacity': 0,
+                    'icon-opacity': 0
+                }
+            });
+
+            // Four approach arrows, one per landing direction (RWY 11/29/16/34).
+            // Headings computed geodetically from the published threshold coordinates
+            // on the aerodrome chart; each cross-checks against its own designator
+            // once the chart's 5 deg E variation is applied (e.g. RWY16 = 164.0 true
+            // -> 159.0 magnetic -> "16"). Arrowheads are explicit triangle polygons
+            // rather than font glyphs, so they don't depend on the style's glyph set.
+            map.addSource('loww-approach-arrows', {
+                type: 'geojson',
+                tolerance: 0,
+                data: './assets/approach_arrows.geojson'
+            });
+
+            map.addLayer({
+                id: 'approach-arrow-shafts',
+                type: 'line',
+                source: 'loww-approach-arrows',
+                filter: ['==', ['get', 'kind'], 'shaft'],
+                paint: {
+                    'line-color': '#ff6b6b',
+                    'line-width': 5,
+                    'line-opacity': 0
+                }
+            });
+
+            map.addLayer({
+                id: 'approach-arrow-heads',
+                type: 'fill',
+                source: 'loww-approach-arrows',
+                filter: ['==', ['get', 'kind'], 'head'],
+                paint: {
+                    'fill-color': '#ff6b6b',
+                    'fill-opacity': 0
+                }
+            });
+
+            map.addLayer({
+                id: 'approach-arrow-labels',
+                type: 'symbol',
+                source: 'loww-approach-arrows',
+                filter: ['==', ['get', 'kind'], 'label'],
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-size': 22,
+                    'text-allow-overlap': true,
+                    'text-ignore-placement': true
+                },
+                paint: {
+                    'text-color': '#ffffff',
+                    'text-halo-color': '#000000',
+                    'text-halo-width': 2,
+                    'text-opacity': 0,
+                    'icon-opacity': 0
+                }
+            });
+
+            // Enter the first chapter now that all layers/sources exist
+            enterChapter(0);
         });
-
-        // Handle window resize
-        window.addEventListener('resize', scroller.resize);
     </script>
 
 </body>
