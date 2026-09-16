@@ -13,7 +13,7 @@ var config = {
     markerColor: '#3FB1CE',
 
     // Enable inset minimap
-    inset: true,
+    inset: false,
     insetStyle: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
     insetPosition: 'bottom-right', // Options: 'top-left', 'top-right', 'bottom-left', 'bottom-right'
     insetZoom: 1,
@@ -36,30 +36,59 @@ var config = {
     auto: false,
 
     // Story metadata
-<<<<<<< Updated upstream
-    title: 'Your Story Title',
-    subtitle: 'A scrollytelling map experience built with MapLibre GL JS',
-    byline: 'By Your Name',
-    footer: 'Source: Your data sources here. <br> Created using <a href="https://github.com/opengeos/maplibre-gl-storymaps" target="_blank">MapLibre Storytelling</a> template, inspired by <a href="https://github.com/mapbox/storytelling" target="_blank">Mapbox Storytelling</a>.',
-=======
     title: 'Approach Anonymous',
     subtitle: 'How to cope with airplane noise. An introduction to publicly available aeronautical and meteorological data sources.',
     byline: 'By Gérie',
     footer: 'Charts courtesy of Austro Control GmbH, via <a href="https://www.vacc-austria.org/?page=content/chart_overview" target="_blank">VACC Austria</a> — for flight simulation and non-commercial use only.<br>Created using <a href="https://github.com/opengeos/maplibre-gl-storymaps" target="_blank">MapLibre Storytelling</a> template, inspired by <a href="https://github.com/mapbox/storytelling" target="_blank">Mapbox Storytelling</a>.',
->>>>>>> Stashed changes
 
     // Story chapters
     chapters: [
         {
+            id: 'chapter-0',
+            alignment: 'left',
+            hidden: true,
+            showMarker: false,
+            title: '',
+            image: '',
+            description: '',
+            location: {
+                center: [16.381,48.2],
+                zoom: 11,
+                pitch: 45,
+                bearing: 0
+            },
+            mapAnimation: 'flyTo',
+            rotateAnimation: false,
+            callback: '',
+            onChapterEnter: [
+                // Example: show a layer when entering this chapter
+                // {
+                //     layer: 'layer-name',
+                //     opacity: 1,
+                //     duration: 5000
+                // }
+            ],
+            onChapterExit: [
+                // Example: hide a layer when exiting this chapter
+                // {
+                //     layer: 'layer-name',
+                //     opacity: 0
+                // }
+            ]
+        },
+        {
             id: 'chapter-1',
             alignment: 'left',
             hidden: false,
-            title: 'San Francisco, California',
-            image: './assets/san-francisco.jpg',
-            description: 'San Francisco, a hilly city on the tip of a peninsula surrounded by the Pacific Ocean and San Francisco Bay, is known for its year-round fog, iconic Golden Gate Bridge, cable cars and colorful Victorian houses. <br><br>The city is also known for its vibrant tech industry, diverse neighborhoods, and rich cultural scene.',
+            title: 'New home new problems',
+            image: '',
+            description: 'Favoritenstraße ███/██-██, 1100 Favoriten, Wien',
+            // one extra Next plays the flyover clip, then Next again moves on
+            popup: './assets/flyover.mp4',
+            popupCaption: 'Filmed out the window.',
             location: {
-                center: [-122.4194, 37.7749],
-                zoom: 11,
+                center: [16.381493160181233, 48.16786091798868],
+                zoom: 16.7,
                 pitch: 45,
                 bearing: 0
             },
@@ -86,87 +115,116 @@ var config = {
             id: 'chapter-2',
             alignment: 'right',
             hidden: false,
-            title: 'New York City, New York',
-            image: './assets/new-york.jpg',
-            description: 'New York City comprises 5 boroughs sitting where the Hudson River meets the Atlantic Ocean. At its core is Manhattan, a densely populated borough that\'s among the world\'s major commercial, financial and cultural centers. <br><br>Its iconic sites include skyscrapers such as the Empire State Building and sprawling Central Park.',
+            showMarker: true,
+            markerLocation: [16.5697, 48.1103], // airport reference point - independent of the camera's framing center below
+            title: 'Vienna International Airport',
+            image: '',
+            description: 'IATA: VIE<br>ICAO: LOWW<br><br>IATA codes are what you would see usually, 3 letter shortened versions of airport names or cities they serve.<br><br>ICAO names are 4 letters internationally standardized. First letter denotes region (L is central/southern Europe including the eastern Mediterranean) second letter denotes country in the region (O for Austria), the last two letters are chosen per airport by the country, for austria the third letter denotes category (W for major airport, X for military and A for smaller airfields), fourth letter denotes the city it is mainly serving (W for Wien)', // IATA (VIE) / ICAO (LOWW) codes
             location: {
-                center: [-74.0060, 40.7128],
-                zoom: 11,
-                pitch: 60,
-                bearing: -43.2
+                // Flat, rotated to match the chart's own page orientation
+                // (~25° off true north), but zoomed out a bit wider than the chart itself
+                center: [16.59, 48.10],
+                zoom: 12.7,
+                pitch: 12,
+                bearing: 25.77
             },
             mapAnimation: 'flyTo',
-            rotateAnimation: true,
+            rotateAnimation: false,
             callback: '',
-            onChapterEnter: [],
+            onChapterEnter: [
+                { layer: 'loww-chart-overlay', opacity: 0, duration: 0 }
+            ],
             onChapterExit: []
         },
         {
             id: 'chapter-3',
-            alignment: 'left',
-            hidden: false,
-            title: 'Tokyo, Japan',
-            image: './assets/tokyo.jpg',
-            description: 'Tokyo, Japan\'s busy capital, mixes the ultramodern and the traditional, from neon-lit skyscrapers to historic temples. The opulent Meiji Shinto Shrine is known for its towering gate and surrounding woods. <br><br>The Imperial Palace sits amid large public gardens. The city\'s many museums offer exhibits ranging from classical art to a reconstructed kabuki theater.',
+            alignment: 'right',
+            hidden: true,
+            title: 'The Aerodrome Chart',
+            image: '',
+            description: '',
+            showMarker: false,
             location: {
-                center: [139.6917, 35.6895],
-                zoom: 10,
-                pitch: 30,
-                bearing: 20
+                // Same rotation/pitch as chapter 2 - just push in closer, to roughly
+                // the chart's own real-world footprint, then reveal it draped in place
+                center: [16.566103, 48.112286],
+                zoom: 13.2,
+                pitch: 0,
+                bearing: 25.77
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,
             callback: '',
-            onChapterEnter: [],
-            onChapterExit: []
+            onChapterEnter: [
+                { layer: 'loww-chart-overlay', opacity: 0.85, duration: 2000 }
+            ],
+            onChapterExit: [
+                { layer: 'loww-chart-overlay', opacity: 0, duration: 1000 }
+            ]
         },
         {
             id: 'chapter-4',
-            alignment: 'center',
+            alignment: 'top-right',
             hidden: false,
-<<<<<<< Updated upstream
-            title: 'Sydney, Australia',
-            image: './assets/sydney.jpg',
-            description: 'Sydney, capital of New South Wales and one of Australia\'s largest cities, is best known for its harbourfront Sydney Opera House, with a distinctive sail-like design. <br><br>Massive Darling Harbour and the smaller Circular Quay port are hubs of waterside life, with the arched Harbour Bridge and esteemed Royal Botanic Garden nearby.',
-=======
             title: 'RWY 11 Final Approach',
             image: './assets/loww_ils11_approach_track.png', // cropped to just the plan-view approach track (D-13.0 OEW to LOWW)
             description: 'Final Approaches (or "Finals") are aligned with the runway (flying along what is geometrically called the extended centerline), it officially begins at the "Final Approach Fix" (FAF). How far out exactly that point is depends on the airport, runway and procedure type. The specifics of approaches are detailed in ICAO normed charts published by national agencies.<span class="src">Chart: Austro Control, via VACC Austria — vacc-austria.org/?page=content/chart_overview</span>',
             showMarker: false, // camera center here is just framing, not a real place - see the explicit home dot instead
->>>>>>> Stashed changes
             location: {
-                center: [151.2093, -33.8688],
-                zoom: 11,
-                pitch: 45,
-                bearing: 0
+                // Pull back to reveal the runway + the extended approach path
+                // running from the apartment down to the threshold.
+                // padding reserves screen space for the top-right blurb (roughly
+                // its 34vw+5vw width and 8vh top offset at a ~1600-1900px wide
+                // window) so MapLibre keeps the path clear of it automatically,
+                // rather than hand-tuning the center to dodge a fixed panel.
+                center: [16.49, 48.15],
+                zoom: 11.9,
+                pitch: 0,
+                bearing: 0,
+                padding: { top: 80, right: 325 }
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,
             callback: '',
-            onChapterEnter: [],
-            onChapterExit: []
+            onChapterEnter: [
+                { layer: 'rwy11-extended-centerline', opacity: 0.9, duration: 3000 },
+                { layer: 'rwy11-runway', opacity: 0.9, duration: 2000 },
+                { layer: 'rwy11-thr11-dot', opacity: 1, duration: 3000 },
+                { layer: 'rwy11-home-marker', opacity: 1, duration: 3500 },
+                // the measurement apparatus is saved for the close-up (chapter 5).
+                // set explicitly to 0 rather than just omitted, so stepping back here
+                // from chapter 5 clears them again
+                { layer: 'rwy11-crosstrack', opacity: 0, duration: 500 },
+                { layer: 'rwy11-closest-point', opacity: 0, duration: 500 },
+                { layer: 'rwy11-distance-label', opacity: 0, duration: 500 },
+                { layer: 'rwy11-crosstrack-label', opacity: 0, duration: 500 }
+            ],
+            onChapterExit: [
+                { layer: 'rwy11-extended-centerline', opacity: 0, duration: 500 },
+                { layer: 'rwy11-runway', opacity: 0, duration: 500 },
+                { layer: 'rwy11-thr11-dot', opacity: 0, duration: 500 },
+                { layer: 'rwy11-home-marker', opacity: 0, duration: 500 }
+            ]
         },
         {
             id: 'chapter-5',
-            alignment: 'fully',
+            alignment: 'right',
             hidden: false,
-            title: 'Cape Town, South Africa',
-            image: './assets/cape-town.jpg',
-            description: 'Cape Town is a port city on South Africa\'s southwest coast, on a peninsula beneath the imposing Table Mountain. Slowly rotating cable cars climb to the mountain\'s flat top, from which there are sweeping views of the city, the busy harbor and boats headed for Robben Island, the infamous prison that once held Nelson Mandela. <br><br>You can add as many chapters as you need to tell your story.',
+            title: 'Closest Point to Home',
+            showMarker: false,
+            image: '',
+            description: '',
             location: {
-                center: [18.4241, -33.9249],
-                zoom: 10,
-                pitch: 50,
-                bearing: 30
+                // Push in tight on the abeam point - home and the centerline
+                // side by side, bearing aligned with the direction of travel
+                center: [16.382569, 48.169355],
+                zoom: 16,
+                pitch: 0,
+                bearing: 115.76
             },
             mapAnimation: 'flyTo',
             rotateAnimation: false,
             callback: '',
-<<<<<<< Updated upstream
-            onChapterEnter: [],
-            onChapterExit: []
-        }
-=======
             onChapterEnter: [
                 { layer: 'rwy11-extended-centerline', opacity: 0.9, duration: 2000 },
                 { layer: 'rwy11-crosstrack', opacity: 0.9, duration: 2000 },
@@ -481,6 +539,5 @@ https://opensky-network.org/api/states/all?lamin=47.9&amp;lomin=16.0&amp;lamax=4
             ],
             onChapterExit: []
         },
->>>>>>> Stashed changes
     ]
 };
