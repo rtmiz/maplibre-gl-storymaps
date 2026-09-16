@@ -112,6 +112,53 @@
 
         .step img {
             width: 100%;
+<<<<<<< Updated upstream
+=======
+            border-radius: 4px;
+        }
+
+        /* small attribution line at the foot of a caption panel */
+        #caption-panel .src {
+            display: block;
+            margin-top: 0.9em;
+            font-size: 0.85em;
+            opacity: 0.65;
+            line-height: 1.35;
+        }
+
+        #caption-panel.centered {
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40vw;
+        }
+
+        #caption-panel.lefty {
+            left: 5vw;
+            width: 30vw;
+        }
+
+        #caption-panel.righty {
+            right: 5vw;
+            width: 30vw;
+        }
+
+        #caption-panel.fully {
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70vw;
+        }
+
+        #caption-panel.righty-large {
+            right: 5vw;
+            width: 50vw;
+        }
+
+        #caption-panel.top-righty {
+            bottom: auto;
+            top: 8vh;
+            right: 5vw;
+            width: 34vw;
+>>>>>>> Stashed changes
         }
 
         @media (max-width: 750px) {
@@ -125,6 +172,207 @@
             }
         }
 
+<<<<<<< Updated upstream
+=======
+        /* Slide panel: full-screen info "slide" for chapters that aren't about
+           geography (formats, encodings, API walkthroughs). Sits above the map but
+           below #nav-controls so Prev/Next stay usable. */
+        #slide-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 6;
+            overflow-y: auto;
+            padding: 8vh 10vw 14vh 10vw;
+            box-sizing: border-box;
+            transition: opacity 0.25s ease;
+        }
+
+        #slide-panel .slide-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        #slide-panel h2 {
+            font-size: 2.6em;
+            margin: 0 0 0.6em 0;
+            line-height: 1.15;
+        }
+
+        #slide-panel h3 {
+            font-size: 1.5em;
+            margin: 1.4em 0 0.4em 0;
+        }
+
+        #slide-panel p,
+        #slide-panel li {
+            font-size: 1.35em;
+            line-height: 1.6;
+        }
+
+        #slide-panel ul {
+            padding-left: 1.2em;
+        }
+
+        #slide-panel li {
+            margin-bottom: 0.5em;
+        }
+
+        #slide-panel code,
+        #slide-panel pre {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            background: rgba(127, 127, 127, 0.22);
+            border-radius: 4px;
+        }
+
+        #slide-panel code {
+            padding: 0.1em 0.35em;
+            font-size: 0.95em;
+        }
+
+        #slide-panel pre {
+            padding: 0.9em 1.1em;
+            font-size: 1.15em;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        #slide-panel .accent {
+            color: #ffd23f;
+        }
+
+        /* "Where to get it" block at the foot of a slide - reference material,
+           deliberately outside the data-step walkthrough */
+        #slide-panel h3.source-heading {
+            margin-top: 1.1em;
+            margin-bottom: 0.3em;
+            font-size: 1.15em;
+            opacity: 0.75;
+        }
+
+        #slide-panel pre.source {
+            font-size: 0.82em;
+            padding: 0.7em 0.9em;
+        }
+
+        /* the endpoint actually wired up, picked out from the alternatives */
+        #slide-panel pre.source b {
+            font-weight: 700;
+        }
+
+        #slide-panel pre.source .alt {
+            opacity: 0.55;
+        }
+
+        #slide-panel p.source-note {
+            font-size: 0.95em;
+            opacity: 0.6;
+            margin-top: 0.4em;
+        }
+
+        /* Build steps: elements tagged data-step="N" are walked through one at a
+           time with Next/Prev. Current one is accented, not-yet-reached ones dim. */
+        #slide-panel [data-step] {
+            transition: opacity 0.25s ease, color 0.25s ease, background-color 0.25s ease;
+        }
+
+        #slide-panel .step-future {
+            opacity: 0.25;
+        }
+
+        #slide-panel .step-current {
+            color: #ffd23f;
+        }
+
+        #slide-panel pre .step-current,
+        #slide-panel .step-current code {
+            background: rgba(255, 210, 63, 0.25);
+            color: #ffd23f;
+            border-radius: 3px;
+        }
+
+        /* Popup: an extra click on a map chapter that overlays an image
+           (a chart crop, a screenshot) without leaving the chapter. */
+        #popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 8;
+            background: rgba(0, 0, 0, 0.72);
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.25s ease;
+        }
+
+        #popup-overlay.visible {
+            display: flex;
+        }
+
+        #popup-overlay img,
+        #popup-overlay video {
+            display: block;
+            max-width: 78vw;
+            max-height: 74vh;
+            border-radius: 8px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        #popup-overlay .popup-caption {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 18px;
+            color: #fafafa;
+            text-shadow: 0 1px 4px #000;
+        }
+
+        /* Prev/Next navigation controls */
+        #nav-controls {
+            position: fixed;
+            bottom: 3vh;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;   /* above #popup-overlay so nav stays usable */
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 24px;
+            font-size: 13px;
+        }
+
+        #nav-controls button {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            padding: 6px 16px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* intro chapter shows the footer, which is two lines tall - sit above it */
+        #nav-controls.above-footer {
+            bottom: 11vh;
+        }
+
+        #nav-controls button:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        #nav-controls button:disabled {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+>>>>>>> Stashed changes
         /* Fix issue on mobile browser where scroll breaks */
         .maplibregl-canvas-container.maplibregl-touch-zoom-rotate.maplibregl-touch-drag-pan,
         .maplibregl-canvas-container.maplibregl-touch-zoom-rotate.maplibregl-touch-drag-pan .maplibregl-canvas {
@@ -348,8 +596,164 @@
             marker.setLngLat(config.chapters[0].location.center).addTo(map);
         }
 
+<<<<<<< Updated upstream
         // Instantiate the scrollama
         var scroller = scrollama();
+=======
+        var currentChapterIndex = 0;
+        var currentStep = 0;        // build step within a slide chapter
+        var navDirection = 1;       // +1 forward, -1 backward - decides where a slide opens
+
+        function updateNav() {
+            var chapter = config.chapters[currentChapterIndex];
+            var steps = stepCount(chapter);
+
+            counter.innerText = (currentChapterIndex + 1) + ' / ' + config.chapters.length +
+                (steps ? '  ·  ' + currentStep + '/' + steps : '');
+
+            prevBtn.disabled = currentChapterIndex === 0 && currentStep === 0;
+            nextBtn.disabled = currentChapterIndex === config.chapters.length - 1 &&
+                currentStep === steps;
+
+            // Title banner and footer are intro-only, like they'd scroll away in the old layout
+            var showIntroChrome = currentChapterIndex === 0;
+            header.style.display = showIntroChrome ? '' : 'none';
+            footer.style.display = showIntroChrome ? '' : 'none';
+            // ...and lift the nav clear of the footer while it's on screen
+            navControls.classList.toggle('above-footer', showIntroChrome);
+        }
+
+        function enterChapter(idx) {
+            var chapter = config.chapters[idx];
+
+            // Info slides cover the map entirely, so skip the camera move and the
+            // marker work - and let them omit `location` altogether.
+            hidePopup();
+
+            if (chapter.slide) {
+                captionPanel.style.display = 'none';
+                renderSlide(chapter);
+                // arriving forwards opens the slide un-annotated; arriving backwards
+                // from a later chapter opens it fully built, where you left it
+                currentStep = navDirection < 0 ? slideStepCount() : 0;
+                applySlideStep();
+                if (chapter.onChapterEnter && chapter.onChapterEnter.length > 0) {
+                    chapter.onChapterEnter.forEach(setLayerOpacity);
+                }
+                updateNav();
+                return;
+            }
+
+            // like slides, arriving backwards lands on the chapter fully built
+            currentStep = navDirection < 0 ? stepCount(chapter) : 0;
+            applyStep(chapter);
+            slidePanel.style.display = 'none';
+
+            // The pin can be placed independently of the camera's framing center -
+            // e.g. to keep it off to the side, clear of the caption panel - by
+            // setting a chapter's markerLocation; falls back to location.center.
+            var markerLocation = chapter.markerLocation || chapter.location.center;
+
+            // MapLibre's camera padding persists across flyTo/easeTo calls until
+            // explicitly changed - without this, a chapter that sets padding would
+            // leak it into every chapter after it that doesn't set its own.
+            var location = chapter.location;
+            if (!location.padding) {
+                location = Object.assign({}, location, { padding: { top: 0, bottom: 0, left: 0, right: 0 } });
+            }
+
+            map[chapter.mapAnimation || 'flyTo'](location);
+
+            if (config.showMarkers && marker) {
+                // Some chapters (e.g. the wide reveal) center the camera on a framing
+                // point rather than an actual place - don't show a misleading pin there
+                if (chapter.showMarker === false) {
+                    marker.remove();
+                } else {
+                    marker.setLngLat(markerLocation).addTo(map);
+                }
+            }
+
+            if (insetMap && insetMarker) {
+                insetMap.setCenter(markerLocation);
+                insetMarker.setLngLat(markerLocation);
+            }
+
+            if (chapter.onChapterEnter.length > 0) {
+                chapter.onChapterEnter.forEach(setLayerOpacity);
+            }
+            if (chapter.callback) {
+                window[chapter.callback]();
+            }
+            if (chapter.rotateAnimation) {
+                map.once('moveend', () => {
+                    const rotateNumber = map.getBearing();
+                    map.rotateTo(rotateNumber + 180, {
+                        duration: 30000, easing: function (t) {
+                            return t;
+                        }
+                    });
+                });
+            }
+
+            renderCaption(chapter);
+            updateNav();
+        }
+
+        function goToChapter(idx) {
+            idx = Math.max(0, Math.min(idx, config.chapters.length - 1));
+            if (idx === currentChapterIndex) return;
+
+            navDirection = idx > currentChapterIndex ? 1 : -1;
+
+            var prevChapter = config.chapters[currentChapterIndex];
+            // onChapterExit is optional - info slides typically won't define one
+            if (prevChapter.onChapterExit && prevChapter.onChapterExit.length > 0) {
+                prevChapter.onChapterExit.forEach(setLayerOpacity);
+            }
+
+            currentChapterIndex = idx;
+            enterChapter(idx);
+        }
+
+        // On a slide with build steps, Next/Prev walk the steps first and only then
+        // move between chapters - so one clicker button drives the whole talk.
+        function stepForward() {
+            var chapter = config.chapters[currentChapterIndex];
+            if (currentStep < stepCount(chapter)) {
+                currentStep++;
+                applyStep(chapter);
+                updateNav();
+                return;
+            }
+            goToChapter(currentChapterIndex + 1);
+        }
+
+        function stepBack() {
+            var chapter = config.chapters[currentChapterIndex];
+            if (currentStep > 0) {
+                currentStep--;
+                applyStep(chapter);
+                updateNav();
+                return;
+            }
+            goToChapter(currentChapterIndex - 1);
+        }
+
+        prevBtn.addEventListener('click', stepBack);
+        nextBtn.addEventListener('click', stepForward);
+
+        // Arrow keys / Page Up-Down / Space so a presentation clicker works too
+        window.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+                stepForward();
+                e.preventDefault();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+                stepBack();
+                e.preventDefault();
+            }
+        });
+>>>>>>> Stashed changes
 
         map.on("load", function () {
             // Add 3D terrain if enabled
