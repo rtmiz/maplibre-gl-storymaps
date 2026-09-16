@@ -39,7 +39,7 @@ var config = {
     title: 'Approach Anonymous',
     subtitle: 'How to cope with airplane noise. An introduction to publicly available aeronautical and meteorological data sources.',
     byline: 'By Gérie',
-    footer: 'Created using <a href="https://github.com/opengeos/maplibre-gl-storymaps" target="_blank">MapLibre Storytelling</a> template, inspired by <a href="https://github.com/mapbox/storytelling" target="_blank">Mapbox Storytelling</a>.',
+    footer: 'Charts courtesy of Austro Control GmbH, via <a href="https://www.vacc-austria.org/?page=content/chart_overview" target="_blank">VACC Austria</a> — for flight simulation and non-commercial use only.<br>Created using <a href="https://github.com/opengeos/maplibre-gl-storymaps" target="_blank">MapLibre Storytelling</a> template, inspired by <a href="https://github.com/mapbox/storytelling" target="_blank">Mapbox Storytelling</a>.',
 
     // Story chapters
     chapters: [
@@ -168,7 +168,7 @@ var config = {
             hidden: false,
             title: 'RWY 11 Final Approach',
             image: './assets/loww_ils11_approach_track.png', // cropped to just the plan-view approach track (D-13.0 OEW to LOWW)
-            description: 'Final Approaches (or "Finals") are aligned with the runway (flying along what is geometrically called the extended centerline), it officially begins at the "Final Approach Fix" (FAF). How far out exactly that point is depends on the airport, runway and procedure type. The specifics of approaches are detailed in ICAO normed charts published by national agencies.',
+            description: 'Final Approaches (or "Finals") are aligned with the runway (flying along what is geometrically called the extended centerline), it officially begins at the "Final Approach Fix" (FAF). How far out exactly that point is depends on the airport, runway and procedure type. The specifics of approaches are detailed in ICAO normed charts published by national agencies.<span class="src">Chart: Austro Control, via VACC Austria — vacc-austria.org/?page=content/chart_overview</span>',
             showMarker: false, // camera center here is just framing, not a real place - see the explicit home dot instead
             location: {
                 // Pull back to reveal the runway + the extended approach path
@@ -241,7 +241,7 @@ var config = {
             hidden: false,
             title: 'The Glidepath',
             image: './assets/loww_ils11_profile.png', // official ILS/LOC RWY11 approach chart (GP 3.1°)
-            description: 'Standard GP is 3°, LOWW RWY 11 has 3.1°, all other runways have 3 flat. My first guess was noise, but it turns out the OMV refinery needs a few meters extra clearance.',
+            description: 'Standard GP is 3°, LOWW RWY 11 has 3.1°, all other runways have 3 flat. My first guess was noise, but it turns out the OMV refinery needs a few meters extra clearance.<span class="src">Chart: Austro Control, via VACC Austria — vacc-austria.org/?page=content/chart_overview</span>',
             // one extra Next on this chapter overlays the answer, then Next again moves on
             popup: './assets/pilot_omv_answer.png',
             popupCaption: 'Asked a pilot.',
@@ -250,7 +250,7 @@ var config = {
                 // Flip the pitch - now looking along the 3.1° ILS glidepath in
                 // pseudo-3D, extruded to true scale (real meters of altitude)
                 center: [16.54, 48.15],
-                zoom: 12,
+                zoom: 12,‹ Prev
                 pitch: 68,
                 bearing: 0
             },
@@ -406,6 +406,10 @@ var config = {
                     <li data-step="5"><code>Q1019</code> — QNH 1019 hPa</li>
                     <li data-step="6"><code>NOSIG</code> — no significant change expected in the next 2 hours</li>
                 </ul>
+                <h3 class="source-heading">Where to get it</h3>
+<pre class="source"><b>https://aviationweather.gov/api/data/metar?ids=LOWW&amp;format=json</b>
+<span class="alt">https://tgftp.nws.noaa.gov/data/observations/metar/stations/LOWW.TXT</span></pre>
+                <p class="source-note">NOAA / US National Weather Service. <code>format=</code> takes json, raw, xml or html.</p>
             `,
             onChapterEnter: [],
             onChapterExit: []
@@ -421,16 +425,24 @@ var config = {
   <span data-step="4">TX26/1614Z TN12/1604Z</span>
   <span data-step="5">BECMG 1610/1612 16009KT</span>
   <span data-step="6">BECMG 1621/1623 28012KT</span>
-  <span data-step="7">PROB30 TEMPO 1621/1624 30020G30KT 4000 TSRA FEW040CB SCT050</span></pre>
+  <span data-step="7">PROB30 TEMPO 1621/1624</span> <span data-step="8">30020G30KT</span> <span data-step="9">4000</span> <span data-step="10">TSRA</span> <span data-step="11">FEW040CB SCT050</span></pre>
                 <ul>
                     <li data-step="1"><code>151715Z</code> — issued day 15, 17:15 UTC</li>
                     <li data-step="2"><code>1518/1624</code> — valid from day 15 18:00Z to day 16 24:00Z. A 30-hour forecast.</li>
-                    <li data-step="3"><code>13005KT CAVOK</code> — the prevailing conditions to start with, same grammar as a METAR</li>
+                    <li data-step="3"><code>13005KT CAVOK</code> — the current conditions, same as a METAR</li>
                     <li data-step="4"><code>TX26/1614Z TN12/1604Z</code> — max 26°C at 14:00Z on the 16th, min 12°C at 04:00Z</li>
-                    <li data-step="5"><code>BECMG 1610/1612</code> — a <em>permanent</em> change, arriving gradually within that window: wind swinging to 160° at 9kt</li>
-                    <li data-step="6"><code>BECMG 1621/1623</code> — and later round to 280° at 12kt. Note what that does to the runway choice.</li>
-                    <li data-step="7"><code>PROB30 TEMPO 1621/1624 30020G30KT 4000 TSRA</code> — 30% chance of <em>temporary</em> spells: 20kt gusting 30, visibility down to 4km, thunderstorms with rain, cumulonimbus at 4000ft</li>
+                    <li data-step="5"><code>BECMG 1610/1612 16009KT</code> — Wind swings from 130° round to 160°, and picks up from 5 to 9 knots.</li>
+                    <li data-step="6"><code>BECMG 1621/1623 28012KT</code> — and later to 280° at 12 knots. That is a swing of 120°</li>
+                    <li data-step="7"><code>PROB30 TEMPO 1621/1624</code> — a 30% chance of <em>temporary</em> spells between 21:00Z and 24:00Z on the 16th. TEMPO means brief: under an hour at a time, and less than half the window in total.</li>
+                    <li data-step="8"><code>30020G30KT</code> — wind from bearing 300° at 20 knots, gusting 30.</li>
+                    <li data-step="9"><code>4000</code> — visibility, in <em>metres</em>: down to 4 km, no longer CAVOK.</li>
+                    <li data-step="10"><code>TSRA</code> — weather-phenomena, built from two-letter codes: <code>TS</code> thunderstorm + <code>RA</code> rain.</li>
+                    <li data-step="11"><code>FEW040CB</code> and <code>SCT050</code> — cloud coverage. Amount in eighths of sky (<code>FEW</code> 1–2, <code>SCT</code> 3–4, <code>BKN</code> 5–7, <code>OVC</code> 8), then height in hundreds of feet <em>above the aerodrome</em>. So: a little cumulonimbus at 4000ft, and scattered cloud at 5000ft. <code>CB</code> and <code>TCU</code> are the only types ever named, because they are the ones that mean turbulence.</li>
                 </ul>
+                <h3 class="source-heading">Where to get it</h3>
+<pre class="source"><b>https://aviationweather.gov/api/data/taf?ids=LOWW&amp;format=raw</b>
+<span class="alt">https://tgftp.nws.noaa.gov/data/forecasts/taf/stations/LOWW.TXT</span></pre>
+                <p class="source-note">Same NOAA service as the METAR.</p>
             `,
             onChapterEnter: [],
             onChapterExit: []
@@ -490,6 +502,11 @@ var config = {
                     <li data-step="7"><code>squawk</code> — the old Mode A code. <code>1000</code> means "identified by Mode S address instead".</li>
                     <li data-step="8"><code>r</code> / <code>t</code> — registration and type are not broadcast. Aggregators looks them up from the hex.</li>
                 </ul>
+                <h3 class="source-heading">Where to get it</h3>
+<pre class="source"><b>https://opendata.adsb.fi/api/v2/lat/48.1679/lon/16.3815/dist/25</b>
+<span class="alt">https://api.adsb.lol/v2/lat/48.1679/lon/16.3815/dist/25
+https://opensky-network.org/api/states/all?lamin=47.9&amp;lomin=16.0&amp;lamax=48.4&amp;lomax=16.8</span></pre>
+                <p class="source-note">No official public feed exists for ADS-B: these are community receiver networks (adsb.lol, adsb.fi) and an academic one (OpenSky). An RTL-SDR dongle running dump1090 would function the same locally.</p>
             `,
             onChapterEnter: [],
             onChapterExit: []
